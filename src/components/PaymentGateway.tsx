@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -10,6 +10,7 @@ import {
   MoveRight,
   Shield,
   Zap,
+  Clock,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
@@ -40,12 +41,29 @@ const PaymentGateway: React.FC = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [paymentClicked, setPaymentClicked] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
+  const [paymentCountdown, setPaymentCountdown] = useState(10);
+  const [showPayButton, setShowPayButton] = useState(false);
 
   const progressMap = {
     details: 33,
     payment: 66,
     confirm: 100,
   };
+
+  useEffect(() => {
+    let timer: number | undefined;
+    if (paymentInitiated && paymentCountdown > 0) {
+      timer = window.setTimeout(() => {
+        setPaymentCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (paymentInitiated && paymentCountdown === 0) {
+      setShowPayButton(true);
+    }
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [paymentInitiated, paymentCountdown]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -95,8 +113,10 @@ const PaymentGateway: React.FC = () => {
     // Open UPI payment app
     window.location.href = upiURL;
     
-    // Set payment initiated flag
+    // Set payment initiated flag and start countdown
     setPaymentInitiated(true);
+    setPaymentCountdown(10);
+    setShowPayButton(false);
     
     // Move to confirmation step
     setCurrentStep("confirm");
@@ -153,6 +173,8 @@ const PaymentGateway: React.FC = () => {
     setIsCompleted(false);
     setPaymentClicked(false);
     setPaymentInitiated(false);
+    setPaymentCountdown(10);
+    setShowPayButton(false);
   };
 
   return (
@@ -365,13 +387,31 @@ const PaymentGateway: React.FC = () => {
 
                       {paymentInitiated && !paymentClicked ? (
                         <div className="text-center mb-6">
-                          <p className="mb-4">After payment, click below to confirm:</p>
-                          <button 
-                            onClick={paymentDone}
-                            className="neo-button w-full"
-                          >
-                            ✔ I Have Paid
-                          </button>
+                          {!showPayButton ? (
+                            <div className="flex flex-col items-center justify-center space-y-4">
+                              <div className="flex items-center justify-center space-x-2">
+                                <Clock className="h-5 w-5 text-neon-purple animate-pulse" />
+                                <p>Please wait while we process your payment...</p>
+                              </div>
+                              <div className="w-full bg-muted/40 rounded-full h-2.5">
+                                <div 
+                                  className="bg-neon-purple h-2.5 rounded-full" 
+                                  style={{ width: `${((10-paymentCountdown)/10)*100}%` }}
+                                ></div>
+                              </div>
+                              <p className="text-neon-blue font-medium">{paymentCountdown} seconds remaining</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="mb-4">After payment, click below to confirm:</p>
+                              <button 
+                                onClick={paymentDone}
+                                className="neo-button w-full"
+                              >
+                                ✔ I Have Paid
+                              </button>
+                            </div>
+                          )}
                         </div>
                       ) : paymentClicked ? (
                         <div className="space-y-4">
