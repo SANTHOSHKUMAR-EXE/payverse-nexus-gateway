@@ -38,6 +38,7 @@ const PaymentGateway: React.FC = () => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [paymentClicked, setPaymentClicked] = useState(false);
 
   const progressMap = {
     details: 33,
@@ -56,15 +57,15 @@ const PaymentGateway: React.FC = () => {
     const { name, email, phone } = formData;
     
     if (!name.trim()) {
-      toast.error("Please enter your name");
+      toast.error("❌ Please fill in all fields.");
       return false;
     }
     if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) {
-      toast.error("Please enter a valid email");
+      toast.error("❌ Invalid email format.");
       return false;
     }
     if (!phone.trim() || !/^\d{10}$/.test(phone)) {
-      toast.error("Please enter a valid 10-digit phone number");
+      toast.error("❌ Enter a valid 10-digit phone number.");
       return false;
     }
     
@@ -79,16 +80,16 @@ const PaymentGateway: React.FC = () => {
   };
 
   const initiateUpiPayment = () => {
+    if (!validateForm()) return;
+    
     const { name, email, phone, course, price } = formData;
     
     // UPI payment details
     const upiId = "kiransinghpay@axl";
-    const note = encodeURIComponent(
-      `Payment from ${name}, ${email}, ${phone}, ${course}`
-    );
+    const note = `Payment from ${name}, ${email}, ${phone}, Course: ${course}`;
     
     // Generate UPI URL
-    const upiURL = `upi://pay?pa=${upiId}&pn=Kiran%20Singh&tn=${note}&am=${price}&cu=INR`;
+    const upiURL = `upi://pay?pa=${upiId}&pn=Kiran%20Singh&tn=${encodeURIComponent(note)}&am=${price}&cu=INR`;
     
     // Open UPI payment app
     window.location.href = upiURL;
@@ -97,11 +98,22 @@ const PaymentGateway: React.FC = () => {
     setCurrentStep("confirm");
   };
 
+  const paymentDone = () => {
+    if (!validateForm()) return;
+    
+    if (paymentClicked) {
+      toast.error("❌ Already submitted. Please wait.");
+      return;
+    }
+    
+    setPaymentClicked(true);
+  };
+
   const submitPaymentConfirmation = async () => {
     const { txnId } = formData;
     
     if (!txnId || txnId.length < 8) {
-      toast.error("Please enter a valid Transaction ID (minimum 8 characters)");
+      toast.error("❌ Enter a valid Transaction ID (min 8 characters).");
       return;
     }
     
@@ -110,14 +122,9 @@ const PaymentGateway: React.FC = () => {
     try {
       // Prepare form data for submission
       const { name, email, phone, course } = formData;
-      const encodedName = encodeURIComponent(name);
-      const encodedEmail = encodeURIComponent(email);
-      const encodedPhone = encodeURIComponent(phone);
-      const encodedCourse = encodeURIComponent(course);
-      const encodedTxn = encodeURIComponent(txnId);
       
       // Google Form submission URL
-      const googleFormURL = `https://docs.google.com/forms/d/e/1FAIpQLSdT90vozennnozOGeGeJ0TgfKNnRnnvwBVfiEQTzKpPn-f87w/formResponse?usp=pp_url&entry.913204754=${encodedName}&entry.1327490220=${encodedEmail}&entry.1829641072=${encodedPhone}&entry.1953753319=${encodedCourse}&entry.1832110819=${encodedTxn}`;
+      const googleFormURL = `https://docs.google.com/forms/d/e/1FAIpQLSdT90vozennnozOGeGeJ0TgfKNnRnnvwBVfiEQTzKpPn-f87w/formResponse?usp=pp_url&entry.913204754=${encodeURIComponent(name)}&entry.1327490220=${encodeURIComponent(email)}&entry.1829641072=${encodeURIComponent(phone)}&entry.1953753319=${encodeURIComponent(course)}&entry.1832110819=${encodeURIComponent(txnId)}`;
       
       // Submit form using fetch with no-cors mode
       await fetch(googleFormURL, {
@@ -126,7 +133,7 @@ const PaymentGateway: React.FC = () => {
       });
       
       // Show success message
-      toast.success("Payment recorded successfully!");
+      toast.success("✅ Payment Recorded! Verification Pending...");
       setIsCompleted(true);
     } catch (error) {
       console.error("Error submitting payment:", error);
@@ -140,6 +147,7 @@ const PaymentGateway: React.FC = () => {
     setFormData(initialFormData);
     setCurrentStep("details");
     setIsCompleted(false);
+    setPaymentClicked(false);
   };
 
   return (
@@ -227,6 +235,7 @@ const PaymentGateway: React.FC = () => {
                         className="neo-input w-full"
                         value={formData.name}
                         onChange={handleInputChange}
+                        required
                       />
                     </div>
 
@@ -241,6 +250,7 @@ const PaymentGateway: React.FC = () => {
                         className="neo-input w-full"
                         value={formData.email}
                         onChange={handleInputChange}
+                        required
                       />
                     </div>
 
@@ -255,6 +265,8 @@ const PaymentGateway: React.FC = () => {
                         className="neo-input w-full"
                         value={formData.phone}
                         onChange={handleInputChange}
+                        pattern="[0-9]{10}"
+                        required
                       />
                     </div>
                   </div>
@@ -346,41 +358,53 @@ const PaymentGateway: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="space-y-4">
-                        <div>
-                          <label htmlFor="txnId" className="block text-sm mb-1">
-                            Transaction ID
-                          </label>
-                          <input
-                            type="text"
-                            id="txnId"
-                            placeholder="Enter UPI Transaction ID"
-                            className="neo-input w-full"
-                            value={formData.txnId}
-                            onChange={handleInputChange}
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Find this in your UPI app payment history
-                          </p>
+                      {!paymentClicked ? (
+                        <div className="text-center mb-6">
+                          <p className="mb-4">After payment, click below to confirm:</p>
+                          <button 
+                            onClick={paymentDone}
+                            className="neo-button w-full"
+                          >
+                            ✔ I Have Paid
+                          </button>
                         </div>
-                      </div>
-
-                      <button
-                        onClick={submitPaymentConfirmation}
-                        className="neo-button w-full mt-6 flex items-center justify-center"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader className="mr-2 h-4 w-4 animate-spin" />
-                            <span>Processing...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Confirm Payment</span>
-                          </>
-                        )}
-                      </button>
+                      ) : (
+                        <div className="space-y-4">
+                          <div>
+                            <label htmlFor="txnId" className="block text-sm mb-1">
+                              Transaction ID
+                            </label>
+                            <input
+                              type="text"
+                              id="txnId"
+                              placeholder="Enter UPI Transaction ID"
+                              className="neo-input w-full"
+                              value={formData.txnId}
+                              onChange={handleInputChange}
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Find this in your UPI app payment history
+                            </p>
+                          </div>
+                          
+                          <button
+                            onClick={submitPaymentConfirmation}
+                            className="neo-button w-full mt-6 flex items-center justify-center"
+                            disabled={isSubmitting}
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                                <span>Processing...</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>Submit Payment</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
                       
                       <button
                         onClick={() => setCurrentStep("payment")}
