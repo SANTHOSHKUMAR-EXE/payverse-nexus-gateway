@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -229,9 +230,16 @@ const PaymentGateway: React.FC = () => {
         >
           {/* Header */}
           <div className="p-6 border-b border-border flex items-center justify-between">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-neon-purple to-neon-blue bg-clip-text text-transparent">
-              Zero Defend Security Payment Gateway
-            </h2>
+            <div className="flex items-center">
+              <img 
+                src="https://zerodefendsecurity.com/data/Logo.png" 
+                alt="Zero Defend Security" 
+                className="h-8 w-8 mr-2" 
+              />
+              <h2 className="text-xl font-bold bg-gradient-to-r from-neon-purple to-neon-blue bg-clip-text text-transparent">
+                Zero Defend Security Payment Gateway
+              </h2>
+            </div>
             <div className="flex items-center space-x-2">
               <Shield className="h-4 w-4 text-neon-purple" />
               <span className="text-xs text-muted-foreground">Secure Payment</span>
@@ -566,12 +574,26 @@ const PaymentGateway: React.FC = () => {
           {/* Footer */}
           <div className="p-4 border-t border-border text-xs text-center text-muted-foreground">
             <div className="flex items-center justify-center mb-1">
-              <Shield className="h-3 w-3 mr-1" /> Secured by Zero Defend Security
+              <Shield className="h-3 w-3 mr-1" /> 
+              <span className="flex items-center">
+                Secured by 
+                <img 
+                  src="https://zerodefendsecurity.com/data/Logo.png" 
+                  alt="Zero Defend Security" 
+                  className="h-4 w-4 mx-1" 
+                /> 
+                Zero Defend Security
+              </span>
             </div>
             <p className="mb-2">All transactions are encrypted and secure</p>
-            <p className="text-xs">
-              Developed By Zero Defend Security - for support +91 80759 24249 Mr. Kiran Singh
-            </p>
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-xs">
+                Developed By Zero Defend Security
+              </p>
+              <p className="text-xs">
+                For support: <span className="font-semibold">+91 80759 24249</span> (Mr. Kiran Singh)
+              </p>
+            </div>
             <Button 
               variant="ghost" 
               size="sm" 
