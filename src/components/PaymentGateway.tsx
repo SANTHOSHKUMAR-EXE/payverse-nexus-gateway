@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import {
   Clock,
   FileText,
   ChevronDown,
+  Ticket,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -33,7 +35,10 @@ interface FormData {
   phone: string;
   course: string;
   price: number;
+  originalPrice: number;
+  promoCode: string;
   txnId: string;
+  currency: string;
 }
 
 const initialFormData: FormData = {
@@ -42,8 +47,11 @@ const initialFormData: FormData = {
   countryCode: "+91", // Default to India
   phone: "",
   course: "Android Security & Hacking",
-  price: 4999,
+  price: 12000,
+  originalPrice: 12000,
+  promoCode: "",
   txnId: "",
+  currency: "INR",
 };
 
 // Country codes data for the dropdown
@@ -70,6 +78,22 @@ const countryCodes = [
   { code: "+55", country: "Brazil" },
 ];
 
+// Currency data with exchange rates (approximations)
+const currencies = [
+  { code: "INR", symbol: "₹", name: "Indian Rupee", rate: 1 },
+  { code: "USD", symbol: "$", name: "US Dollar", rate: 0.012 },
+  { code: "EUR", symbol: "€", name: "Euro", rate: 0.011 },
+  { code: "GBP", symbol: "£", name: "British Pound", rate: 0.0095 },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar", rate: 0.018 },
+  { code: "CAD", symbol: "C$", name: "Canadian Dollar", rate: 0.016 },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar", rate: 0.016 },
+  { code: "AED", symbol: "د.إ", name: "UAE Dirham", rate: 0.044 },
+];
+
+// Valid promo code
+const VALID_PROMO_CODE = "ZDS7000";
+const DISCOUNTED_PRICE = 4999;
+
 const PaymentGateway: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<PaymentStep>("details");
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -80,6 +104,7 @@ const PaymentGateway: React.FC = () => {
   const [paymentCountdown, setPaymentCountdown] = useState(20);
   const [showPayButton, setShowPayButton] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
 
   const progressMap = {
     details: 33,
@@ -113,6 +138,29 @@ const PaymentGateway: React.FC = () => {
     setFormData({ ...formData, countryCode: value });
   };
 
+  const handleCurrencyChange = (value: string) => {
+    const selectedCurrency = currencies.find(c => c.code === value);
+    if (selectedCurrency) {
+      setFormData({ 
+        ...formData, 
+        currency: value,
+      });
+    }
+  };
+
+  const applyPromoCode = () => {
+    if (formData.promoCode.trim() === VALID_PROMO_CODE) {
+      setFormData({
+        ...formData,
+        price: DISCOUNTED_PRICE,
+      });
+      setIsPromoApplied(true);
+      toast.success("✅ Promo code applied successfully!");
+    } else {
+      toast.error("❌ Invalid promo code. Please try again.");
+    }
+  };
+
   const validateForm = () => {
     const { name, email, phone } = formData;
     
@@ -142,7 +190,7 @@ const PaymentGateway: React.FC = () => {
   const initiateUpiPayment = () => {
     if (!validateForm()) return;
     
-    const { name, email, phone, course, price } = formData;
+    const { name, email, phone, course, price, currency } = formData;
     
     // UPI payment details
     const upiId = "kiransinghpay@axl";
@@ -217,6 +265,31 @@ const PaymentGateway: React.FC = () => {
     setPaymentInitiated(false);
     setPaymentCountdown(20);
     setShowPayButton(false);
+    setIsPromoApplied(false);
+  };
+
+  // Get current currency symbol
+  const getCurrentCurrencySymbol = () => {
+    const currentCurrency = currencies.find(c => c.code === formData.currency);
+    return currentCurrency ? currentCurrency.symbol : "₹";
+  };
+
+  // Convert price to selected currency
+  const getConvertedPrice = () => {
+    const currentCurrency = currencies.find(c => c.code === formData.currency);
+    if (currentCurrency && currentCurrency.code !== "INR") {
+      return (formData.price * currentCurrency.rate).toFixed(2);
+    }
+    return formData.price.toLocaleString('en-IN');
+  };
+
+  // Get original price in current currency
+  const getOriginalPrice = () => {
+    const currentCurrency = currencies.find(c => c.code === formData.currency);
+    if (currentCurrency && currentCurrency.code !== "INR") {
+      return (formData.originalPrice * currentCurrency.rate).toFixed(2);
+    }
+    return formData.originalPrice.toLocaleString('en-IN');
   };
 
   return (
@@ -293,9 +366,68 @@ const PaymentGateway: React.FC = () => {
                     </div>
                     <div className="p-4 border border-border rounded-lg mb-4 bg-muted/30">
                       <p className="text-lg font-medium">{formData.course}</p>
-                      <p className="text-2xl font-bold text-neon-blue mt-1">
-                        ₹{formData.price}
-                      </p>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <p className="text-2xl font-bold text-neon-blue">
+                          {getCurrentCurrencySymbol()}{getConvertedPrice()}
+                        </p>
+                        {isPromoApplied && (
+                          <p className="text-sm line-through text-muted-foreground">
+                            {getCurrentCurrencySymbol()}{getOriginalPrice()}
+                          </p>
+                        )}
+                      </div>
+                      
+                      {/* Currency selector */}
+                      <div className="mt-4 flex justify-end">
+                        <Select
+                          value={formData.currency}
+                          onValueChange={handleCurrencyChange}
+                        >
+                          <SelectTrigger className="w-[140px] h-8 text-xs">
+                            <SelectValue placeholder="Select Currency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {currencies.map((currency) => (
+                              <SelectItem key={currency.code} value={currency.code}>
+                                {currency.symbol} {currency.code} - {currency.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Promo code input */}
+                    <div className="mb-4">
+                      <div className="flex gap-2">
+                        <div className="flex-grow">
+                          <div className="relative">
+                            <Ticket className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <input
+                              type="text"
+                              id="promoCode"
+                              placeholder="Enter promo code"
+                              className="neo-input pl-10 w-full"
+                              value={formData.promoCode}
+                              onChange={handleInputChange}
+                              disabled={isPromoApplied}
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          onClick={applyPromoCode}
+                          disabled={isPromoApplied || !formData.promoCode.trim()}
+                          className="neo-button-secondary"
+                        >
+                          {isPromoApplied ? "Applied" : "Apply"}
+                        </Button>
+                      </div>
+                      {isPromoApplied && (
+                        <p className="text-xs text-green-500 mt-1 flex items-center">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Promo code applied! You saved ₹{(formData.originalPrice - formData.price).toLocaleString('en-IN')}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -418,7 +550,7 @@ const PaymentGateway: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Amount</span>
-                      <span className="font-bold text-neon-blue">₹{formData.price}</span>
+                      <span className="font-bold text-neon-blue">₹{formData.price.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
 
@@ -426,7 +558,7 @@ const PaymentGateway: React.FC = () => {
                     onClick={initiateUpiPayment}
                     className="neo-button w-full mb-4 animate-pulse-glow"
                   >
-                    Pay ₹{formData.price} via UPI
+                    Pay ₹{formData.price.toLocaleString('en-IN')} via UPI
                   </button>
                   
                   <button
