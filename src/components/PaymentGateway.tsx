@@ -399,7 +399,7 @@ const PaymentGateway: React.FC = () => {
                       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" 
                            alt="UPI" 
                            className="h-8" />
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" 
+                      <img src="https://zerodefendsecurity.com/data/gpay.png" 
                            alt="Google Pay" 
                            className="h-7" />
                       <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" 
