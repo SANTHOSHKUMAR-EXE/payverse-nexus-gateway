@@ -39,6 +39,7 @@ const PaymentGateway: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [paymentClicked, setPaymentClicked] = useState(false);
+  const [paymentInitiated, setPaymentInitiated] = useState(false);
 
   const progressMap = {
     details: 33,
@@ -94,6 +95,9 @@ const PaymentGateway: React.FC = () => {
     // Open UPI payment app
     window.location.href = upiURL;
     
+    // Set payment initiated flag
+    setPaymentInitiated(true);
+    
     // Move to confirmation step
     setCurrentStep("confirm");
   };
@@ -148,6 +152,7 @@ const PaymentGateway: React.FC = () => {
     setCurrentStep("details");
     setIsCompleted(false);
     setPaymentClicked(false);
+    setPaymentInitiated(false);
   };
 
   return (
@@ -358,7 +363,7 @@ const PaymentGateway: React.FC = () => {
                         </p>
                       </div>
 
-                      {!paymentClicked ? (
+                      {paymentInitiated && !paymentClicked ? (
                         <div className="text-center mb-6">
                           <p className="mb-4">After payment, click below to confirm:</p>
                           <button 
@@ -368,7 +373,7 @@ const PaymentGateway: React.FC = () => {
                             ✔ I Have Paid
                           </button>
                         </div>
-                      ) : (
+                      ) : paymentClicked ? (
                         <div className="space-y-4">
                           <div>
                             <label htmlFor="txnId" className="block text-sm mb-1">
@@ -402,6 +407,18 @@ const PaymentGateway: React.FC = () => {
                                 <span>Submit Payment</span>
                               </>
                             )}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <p className="mb-4 text-muted-foreground">
+                            Please complete your payment using the UPI app that opened.
+                          </p>
+                          <button
+                            onClick={() => setCurrentStep("payment")}
+                            className="neo-button w-full"
+                          >
+                            Return to Payment Options
                           </button>
                         </div>
                       )}
