@@ -44,7 +44,7 @@ const PaymentGateway: React.FC = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [paymentClicked, setPaymentClicked] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
-  const [paymentCountdown, setPaymentCountdown] = useState(10);
+  const [paymentCountdown, setPaymentCountdown] = useState(20);
   const [showPayButton, setShowPayButton] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
 
@@ -119,7 +119,7 @@ const PaymentGateway: React.FC = () => {
     
     // Set payment initiated flag and start countdown
     setPaymentInitiated(true);
-    setPaymentCountdown(10);
+    setPaymentCountdown(20);
     setShowPayButton(false);
     
     // Move to confirmation step
@@ -177,7 +177,7 @@ const PaymentGateway: React.FC = () => {
     setIsCompleted(false);
     setPaymentClicked(false);
     setPaymentInitiated(false);
-    setPaymentCountdown(10);
+    setPaymentCountdown(20);
     setShowPayButton(false);
   };
 
@@ -400,7 +400,7 @@ const PaymentGateway: React.FC = () => {
                               <div className="w-full bg-muted/40 rounded-full h-2.5">
                                 <div 
                                   className="bg-neon-purple h-2.5 rounded-full" 
-                                  style={{ width: `${((10-paymentCountdown)/10)*100}%` }}
+                                  style={{ width: `${((20-paymentCountdown)/20)*100}%` }}
                                 ></div>
                               </div>
                               <p className="text-neon-blue font-medium">{paymentCountdown} seconds remaining</p>
@@ -480,9 +480,12 @@ const PaymentGateway: React.FC = () => {
                       <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-muted mb-6">
                         <CheckCircle className="h-12 w-12 text-neon-blue" />
                       </div>
-                      <h3 className="text-xl font-medium mb-2">Payment Successful!</h3>
+                      <h3 className="text-xl font-medium mb-2">Payment Under Verification</h3>
                       <p className="text-muted-foreground">
-                        Your payment for {formData.course} has been recorded.
+                        Your payment for {formData.course} is being verified.
+                      </p>
+                      <p className="text-muted-foreground mt-2">
+                        You will receive a confirmation email once verified.
                       </p>
                       <p className="text-muted-foreground text-sm mt-4">
                         Transaction ID: <span className="font-medium">{formData.txnId}</span>
