@@ -395,16 +395,16 @@ const PaymentGateway: React.FC = () => {
                   </div>
 
                   <div className="flex justify-center mb-6">
-                    <div className="inline-flex gap-2">
+                    <div className="inline-flex gap-4 items-center">
                       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" 
                            alt="UPI" 
                            className="h-8" />
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Google_Pay_%28GPay%29_Logo_%282018-2020%29.svg" 
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" 
                            alt="Google Pay" 
-                           className="h-8" />
+                           className="h-7" />
                       <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" 
                            alt="Paytm" 
-                           className="h-8" />
+                           className="h-7" />
                     </div>
                   </div>
 
