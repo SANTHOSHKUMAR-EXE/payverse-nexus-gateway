@@ -11,8 +11,11 @@ import {
   Shield,
   Zap,
   Clock,
+  FileText,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import TermsDialog from "@/components/TermsDialog";
 
 type PaymentStep = "details" | "payment" | "confirm";
 
@@ -43,6 +46,7 @@ const PaymentGateway: React.FC = () => {
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const [paymentCountdown, setPaymentCountdown] = useState(10);
   const [showPayButton, setShowPayButton] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   const progressMap = {
     details: 33,
@@ -188,7 +192,7 @@ const PaymentGateway: React.FC = () => {
           {/* Header */}
           <div className="p-6 border-b border-border flex items-center justify-between">
             <h2 className="text-xl font-bold bg-gradient-to-r from-neon-purple to-neon-blue bg-clip-text text-transparent">
-              PayVerse Nexus Gateway
+              Zero Defend Security Payment Gateway
             </h2>
             <div className="flex items-center space-x-2">
               <Shield className="h-4 w-4 text-neon-purple" />
@@ -198,11 +202,11 @@ const PaymentGateway: React.FC = () => {
 
           {/* Progress Tracker */}
           <div className="px-6 pt-4">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-between mb-2">
               <span className="text-xs text-muted-foreground">
                 Step {currentStep === "details" ? "1" : currentStep === "payment" ? "2" : "3"} of 3
               </span>
-              <span className="text-xs font-medium text-neon-blue">
+              <span className="ml-auto text-xs font-medium text-neon-blue">
                 {progressMap[currentStep]}%
               </span>
             </div>
@@ -500,12 +504,27 @@ const PaymentGateway: React.FC = () => {
           {/* Footer */}
           <div className="p-4 border-t border-border text-xs text-center text-muted-foreground">
             <div className="flex items-center justify-center mb-1">
-              <Shield className="h-3 w-3 mr-1" /> Secured by PayVerse Nexus
+              <Shield className="h-3 w-3 mr-1" /> Secured by Zero Defend Security
             </div>
-            <p>All transactions are encrypted and secure</p>
+            <p className="mb-2">All transactions are encrypted and secure</p>
+            <p className="text-xs">
+              Developed By Zero Defend Security - for support +91 80759 24249 Mr. Kiran Singh
+            </p>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="mt-2 text-xs text-muted-foreground hover:text-neon-blue"
+              onClick={() => setShowTerms(true)}
+            >
+              <FileText className="h-3 w-3 mr-1" />
+              Terms & Conditions
+            </Button>
           </div>
         </motion.div>
       </div>
+      
+      {/* Terms & Conditions Dialog */}
+      <TermsDialog open={showTerms} onOpenChange={setShowTerms} />
     </div>
   );
 };

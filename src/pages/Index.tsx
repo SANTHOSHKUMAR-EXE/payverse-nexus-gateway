@@ -2,7 +2,7 @@
 import PaymentGateway from "@/components/PaymentGateway";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Smartphone, Monitor } from "lucide-react";
+import { Smartphone, Monitor, Shield } from "lucide-react";
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -15,7 +15,8 @@ const Index = () => {
             <Monitor className="h-6 w-6 mr-2" />
             <AlertTitle className="text-xl">Mobile Device Required</AlertTitle>
             <AlertDescription className="mt-2">
-              This payment gateway is designed for mobile devices only. Please open this link on your smartphone to proceed with the payment.
+              Zero Defend Security Payment Gateway is designed for mobile devices only. 
+              Please open this link on your smartphone to proceed with the payment.
             </AlertDescription>
           </Alert>
         </div>
