@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -12,16 +11,25 @@ import {
   Zap,
   Clock,
   FileText,
+  ChevronDown,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import TermsDialog from "@/components/TermsDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type PaymentStep = "details" | "payment" | "confirm";
 
 interface FormData {
   name: string;
   email: string;
+  countryCode: string;
   phone: string;
   course: string;
   price: number;
@@ -31,11 +39,36 @@ interface FormData {
 const initialFormData: FormData = {
   name: "",
   email: "",
+  countryCode: "+91", // Default to India
   phone: "",
   course: "Android Security & Hacking",
   price: 4999,
   txnId: "",
 };
+
+// Country codes data for the dropdown
+const countryCodes = [
+  { code: "+91", country: "India" },
+  { code: "+1", country: "USA" },
+  { code: "+44", country: "UK" },
+  { code: "+61", country: "Australia" },
+  { code: "+86", country: "China" },
+  { code: "+49", country: "Germany" },
+  { code: "+33", country: "France" },
+  { code: "+81", country: "Japan" },
+  { code: "+7", country: "Russia" },
+  { code: "+971", country: "UAE" },
+  { code: "+65", country: "Singapore" },
+  { code: "+60", country: "Malaysia" },
+  { code: "+92", country: "Pakistan" },
+  { code: "+94", country: "Sri Lanka" },
+  { code: "+977", country: "Nepal" },
+  { code: "+880", country: "Bangladesh" },
+  { code: "+63", country: "Philippines" },
+  { code: "+66", country: "Thailand" },
+  { code: "+39", country: "Italy" },
+  { code: "+55", country: "Brazil" },
+];
 
 const PaymentGateway: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<PaymentStep>("details");
@@ -74,6 +107,10 @@ const PaymentGateway: React.FC = () => {
   ) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
+  };
+
+  const handleCountryCodeChange = (value: string) => {
+    setFormData({ ...formData, countryCode: value });
   };
 
   const validateForm = () => {
@@ -149,10 +186,11 @@ const PaymentGateway: React.FC = () => {
     
     try {
       // Prepare form data for submission
-      const { name, email, phone, course } = formData;
+      const { name, email, countryCode, phone, course } = formData;
+      const fullPhoneNumber = `${countryCode}${phone}`;
       
       // Google Form submission URL
-      const googleFormURL = `https://docs.google.com/forms/d/e/1FAIpQLSdT90vozennnozOGeGeJ0TgfKNnRnnvwBVfiEQTzKpPn-f87w/formResponse?usp=pp_url&entry.913204754=${encodeURIComponent(name)}&entry.1327490220=${encodeURIComponent(email)}&entry.1829641072=${encodeURIComponent(phone)}&entry.1953753319=${encodeURIComponent(course)}&entry.1832110819=${encodeURIComponent(txnId)}`;
+      const googleFormURL = `https://docs.google.com/forms/d/e/1FAIpQLSdT90vozennnozOGeGeJ0TgfKNnRnnvwBVfiEQTzKpPn-f87w/formResponse?usp=pp_url&entry.913204754=${encodeURIComponent(name)}&entry.1327490220=${encodeURIComponent(email)}&entry.1829641072=${encodeURIComponent(fullPhoneNumber)}&entry.1953753319=${encodeURIComponent(course)}&entry.1832110819=${encodeURIComponent(txnId)}`;
       
       // Submit form using fetch with no-cors mode
       await fetch(googleFormURL, {
@@ -289,16 +327,37 @@ const PaymentGateway: React.FC = () => {
                       <label htmlFor="phone" className="block text-sm mb-1">
                         Phone Number
                       </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        placeholder="10-digit mobile number"
-                        className="neo-input w-full"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        pattern="[0-9]{10}"
-                        required
-                      />
+                      <div className="flex gap-2">
+                        <div className="w-1/3">
+                          <Select
+                            value={formData.countryCode}
+                            onValueChange={handleCountryCodeChange}
+                          >
+                            <SelectTrigger className="neo-input">
+                              <SelectValue placeholder={formData.countryCode} />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[200px]">
+                              {countryCodes.map((country) => (
+                                <SelectItem key={country.code} value={country.code}>
+                                  {country.code} {country.country}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="w-2/3">
+                          <input
+                            type="tel"
+                            id="phone"
+                            placeholder="10-digit mobile number"
+                            className="neo-input w-full"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            pattern="[0-9]{10}"
+                            required
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
