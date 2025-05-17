@@ -1,17 +1,17 @@
 
 import PaymentGateway from "@/components/PaymentGateway";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useState } from "react";
+import { Loader, QrCode } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Loader, QrCode } from "lucide-react";
-import { toast } from "sonner";
+import ModeSelector from "@/components/ModeSelector";
 
 const Index = () => {
-  const isMobile = useIsMobile();
+  // Replace isMobile hook with manual state
+  const [mode, setMode] = useState<"desktop" | "mobile" | "unselected">("unselected");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [txnId, setTxnId] = useState("");
@@ -59,9 +59,15 @@ const Index = () => {
     }
   };
 
+  // Show mode selector if mode is unselected
+  if (mode === "unselected") {
+    return <ModeSelector onSelectMode={setMode} />;
+  }
+
+  // Render based on selected mode
   return (
     <>
-      {!isMobile ? (
+      {mode === "desktop" ? (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <Card className="max-w-lg w-full">
             <CardHeader>
@@ -176,11 +182,21 @@ const Index = () => {
                   </Button>
                 </div>
               )}
+              
+              <div className="mt-8 text-center">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setMode("unselected")}
+                >
+                  Switch to Mobile Mode
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
       ) : null}
-      <PaymentGateway />
+      {mode === "mobile" ? <PaymentGateway /> : null}
     </>
   );
 };
