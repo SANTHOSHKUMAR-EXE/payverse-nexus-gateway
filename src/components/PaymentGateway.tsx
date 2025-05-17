@@ -47,8 +47,8 @@ const initialFormData: FormData = {
   countryCode: "+91", // Default to India
   phone: "",
   course: "Android Security & Hacking",
-  price: 12000,
-  originalPrice: 12000,
+  price: 45000,
+  originalPrice: 45000,
   promoCode: "",
   txnId: "",
   currency: "INR",
@@ -91,8 +91,8 @@ const currencies = [
 ];
 
 // Valid promo code
-const VALID_PROMO_CODE = "ZDS7000";
-const DISCOUNTED_PRICE = 4999;
+const VALID_PROMO_CODE = "AndroidX2025";
+const DISCOUNTED_PRICE = 8999;
 
 const PaymentGateway: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<PaymentStep>("details");
