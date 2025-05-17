@@ -304,7 +304,7 @@ const PaymentGateway: React.FC = () => {
           <div className="p-6 border-b border-border flex items-center justify-between">
             <div className="flex items-center">
               <img 
-                src="https://zerodefendsecurity.com/data/Logo.png" 
+                src="https://learn.zerodefendsecurity.com/logo.png" 
                 alt="Zero Defend Security" 
                 className="h-8 w-8 mr-2" 
               />
@@ -530,9 +530,9 @@ const PaymentGateway: React.FC = () => {
                       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" 
                            alt="UPI" 
                            className="h-8" />
-                      <img src="https://zerodefendsecurity.com/data/gpay.png" 
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" 
                            alt="Google Pay" 
-                           className="h-9" />
+                           className="h-10" />
                       <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" 
                            alt="Paytm" 
                            className="h-7" />
@@ -709,7 +709,7 @@ const PaymentGateway: React.FC = () => {
               <span className="flex items-center">
                 Secured by 
                 <img 
-                  src="https://zerodefendsecurity.com/data/Logo.png" 
+                  src="https://learn.zerodefendsecurity.com/logo.png" 
                   alt="Zero Defend Security" 
                   className="h-4 w-4 mx-1" 
                 /> 
